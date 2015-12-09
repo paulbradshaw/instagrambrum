@@ -1,28 +1,56 @@
-# This is a template for a Python scraper on morph.io (https://morph.io)
-# including some code snippets below that you should find helpful
+#!/usr/bin/env python
 
 import scraperwiki
+import requests
 import lxml.html
-#
+import re
+
+lots = '''kerry_hill205
+stirchleywines
+puredestination
+galateadesigns
+carlwalters
+honeymoon_dreams
+dawnqueen5
+dayllen44
+purpledecember84'''
+
+lotslist = lots.split('\n')
+print lotslist
 # # Read in a page
-url = 'http://worldc.am/id/4b058831f964a5200eb822e3'
-html = scraperwiki.scrape(url)
-#
+#url = 'http://worldc.am/id/4b058831f964a5200eb822e3'
+#url = 'https://www.instagram.com/p/-0ICf6gPdN/'
+baseurl = 'https://www.instagram.com/'
+url = 'https://www.instagram.com/bhameastside/'
+
 # # Find something on the page using css selectors
-root = lxml.html.fromstring(html)
-profiles = root.cssselect("p[class='profileuser profileline']")
-for profile in profiles:
-  print profile
+def grabfollows(username):
+    userurl = baseurl+username
+    html = scraperwiki.scrape(userurl)
+    root = lxml.html.fromstring(html)
+    print root
+    #profiles = root.cssselect('script')
+    headers = root.cssselect('script')
+    print headers[6].text
+    profiledata = headers[6].text
+    follows = profiledata.split('follows":{"count":')[1].split('}')[0]
+    followers = profiledata.split('"followed_by":{"count":')[1].split('}')[0]
+    print "FOLLOWS:", follows
+    print "FOLLOWERS:", followers
+    record['follows'] = follows
+    record['followers'] = followers 
+    record['username'] = username 
+    scraperwiki.sql.save(['username'], record)
 
-#
-# # Write out to the sqlite database using scraperwiki library
-scraperwiki.sqlite.save(unique_keys=['name'], data={"name": "susan", "occupation": "software developer"})
-#
-# # An arbitrary query against the database
-# scraperwiki.sql.select("* from data where 'name'='peter'")
 
-# You don't have to do things with the ScraperWiki and lxml libraries.
-# You can use whatever libraries you want: https://morph.io/documentation/python
-# All that matters is that your final data is written to an SQLite database
-# called "data.sqlite" in the current working directory which has at least a table
-# called "data".
+record = {}
+for username in lotslist:
+    grabfollows(username)
+
+#html = requests.get(url)
+#print html.content
+
+# Saving data:
+
+
+

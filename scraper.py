@@ -40,7 +40,7 @@ def grabfollows(username):
     record['follows'] = follows
     record['followers'] = followers 
     record['username'] = username 
-    scraperwiki.sql.save(['username'], record)
+    scraperwiki.sqlite.save(['username'], record)
 
 
 record = {}
